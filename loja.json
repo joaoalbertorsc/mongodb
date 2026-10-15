@@ -1,0 +1,36 @@
+// Cria o banco "loja" (só passa a existir após a primeira coleção/documento)
+use("loja");
+
+// Cria a coleção "produtos"
+db.createCollection("produtos");
+
+// Insere 5 produtos
+db.produtos.insertMany([
+  { nome: "Camiseta", categoria: "Vestuário", preco: 49.9, estoque: 100 },
+  { nome: "Calça Jeans", categoria: "Vestuário", preco: 129.9, estoque: 40 },
+  { nome: "Tênis", categoria: "Calçados", preco: 249.9, estoque: 25 },
+  { nome: "Mochila", categoria: "Acessórios", preco: 89.9, estoque: 60 },
+  { nome: "Boné", categoria: "Acessórios", preco: 39.9, estoque: 0 }
+]);
+
+// FIND: todos os produtos
+db.produtos.find();
+// FIND: Vestuário com preço menor que 100
+db.produtos.find({ categoria: "Vestuário", preco: { $lt: 100 } });
+// FIND: só nome e preço, do mais barato ao mais caro
+db.produtos.find({}, { _id: 0, nome: 1, preco: 1 }).sort({ preco: 1 });
+
+// UPDATE: novo preço do Tênis
+db.produtos.updateOne({ nome: "Tênis" }, { $set: { preco: 219.9 } });
+// UPDATE: 10% de desconto em todos os Acessórios
+db.produtos.updateMany({ categoria: "Acessórios" }, { $mul: { preco: 0.9 } });
+// UPDATE: soma 50 ao estoque do Boné
+db.produtos.updateOne({ nome: "Boné" }, { $inc: { estoque: 50 } });
+
+// DELETE: remove a Calça Jeans
+db.produtos.deleteOne({ nome: "Calça Jeans" });
+// DELETE: remove produtos sem estoque (nenhum após o update do Boné)
+db.produtos.deleteMany({ estoque: 0 });
+
+// Resultado final
+db.produtos.find();
